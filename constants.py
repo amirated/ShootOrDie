@@ -1,0 +1,12 @@
+import math
+
+FPS = 60
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+SCALE = 3
+
+SPEED = 5
+DIAGONAL_COEFFICIENT = (math.sqrt(2)/2)
+
+RED = (255, 0, 0)
+BG = (40, 25, 25)
