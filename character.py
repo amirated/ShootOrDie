@@ -3,15 +3,19 @@ import constants
 import math
 
 class Character():
-    def __init__(self, x, y, animation_list, direction):
-        self.direction = direction
+    def __init__(self, x, y, health, mob_animations, char_type):
+        self.char_type = char_type
+        self.direction = 0
         self.frame_index = 0
         self.action = 0 # 0: idle, 1: run
-        self.animation_list = animation_list
+        self.animation_list = mob_animations[char_type]
         self.update_time = pygame.time.get_ticks()
         self.running = False
-        self.image = animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0, 0, 40, 40)
+        self.health = health
+        self.alive = True
+
+        self.image = self.animation_list[self.action][self.frame_index]
+        self.rect = pygame.Rect(0, 0, 55, 55)
         self.rect.center = (x, y)
     
     def move(self, dx, dy):
@@ -44,6 +48,10 @@ class Character():
         self.rect.y += dy
 
     def update(self):
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
+        
         # check player action
         if self.running == True:
             self.update_action(1) # run
@@ -68,6 +76,13 @@ class Character():
 
     def draw(self, surface):
         direction_image = pygame.transform.rotate(self.image, self.direction)
-        surface.blit(direction_image, self.rect)
+        if self.char_type == 0:
+            if self.direction in [45, 135, 225, 315] :
+                surface.blit(direction_image, (self.rect.x - constants.SHOOTER_DIAG_OFFSET, self.rect.y - constants.SHOOTER_DIAG_OFFSET))
+            else:
+                surface.blit(direction_image, (self.rect.x, self.rect.y))
+            # surface.blit(direction_image, self.rect)
+        else:
+            surface.blit(direction_image, self.rect)
         pygame.draw.rect(surface, constants.RED, self.rect, 1)
-        print(self.direction)
+        # print(self.direction)
