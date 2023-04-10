@@ -1,5 +1,5 @@
-# Example file showing a circle moving on screen
 import pygame
+from pygame import mixer
 import constants
 from character import Character
 from weapon import Weapon
@@ -7,6 +7,7 @@ from weapon import Bullet
 from items import Item
 
 # pygame setup
+mixer.init()
 pygame.init()
 
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
@@ -29,6 +30,14 @@ def scale_img(image, scale):
     w = image.get_width()
     h = image.get_height()
     return pygame.transform.scale(image, (w * scale, h * scale))
+
+pygame.mixer.music.load("assets/audio/suspense.wav")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 500)
+shot_fx = pygame.mixer.Sound("assets/audio/shot_fx.wav")
+shot_fx.set_volume(0.5)
+hit_fx = pygame.mixer.Sound("assets/audio/hit_fx.wav")
+hit_fx.set_volume(0.2)
 
 life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").convert_alpha(), constants.ITEM_SCALE)
 life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").convert_alpha(), constants.ITEM_SCALE)
@@ -150,12 +159,10 @@ while running:
     if moving_down == True:
         dy = constants.SPEED
     
-    # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # take keyboard presses
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
@@ -166,8 +173,6 @@ while running:
                 moving_down = True
             if event.key == pygame.K_d:
                 moving_right = True
-            if event.key == pygame.K_SPACE:
-                shoot = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -179,7 +184,6 @@ while running:
             if event.key == pygame.K_d:
                 moving_right = False
 
-    # move player
     player.move(dx, dy)
 
     player.update()
@@ -189,12 +193,14 @@ while running:
     bullet = gun.update(player)
     if bullet:
         bullet_group.add(bullet)
+        shot_fx.play()
 
     for bullet in bullet_group:
         damage, damage_text_pos = bullet.update(villain_list)
         if damage:
             damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
             damage_text_group.add(damage_text)
+            hit_fx.play()
     damage_text_group.update()
     item_group.update(player)
 
@@ -213,7 +219,6 @@ while running:
     display_info()
     score_coin.draw(screen)
 
-    # flip() the display to put your work on screen
     pygame.display.flip()
 
     
