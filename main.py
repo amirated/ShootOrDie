@@ -1,10 +1,12 @@
 import pygame
+import csv
 from pygame import mixer
 import constants
 from character import Character
 from weapon import Weapon
 from weapon import Bullet
 from items import Item
+from world import World
 
 # pygame setup
 mixer.init()
@@ -13,6 +15,9 @@ pygame.init()
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
+
+level = 1
+
 running = True
 dt = 0
 # player_direction = 0
@@ -61,6 +66,12 @@ def create_bullet():
 gun_image = pygame.image.load("assets/images/weapons/gun/0.png").convert_alpha()
 bullet_image = pygame.image.load("assets/images/weapons/bullet.png").convert_alpha()
 
+tile_list = []
+for x in range(constants.TILE_TYPES):
+    tile_image = pygame.image.load(f"assets/images/tiles/{x}.png").convert_alpha()
+    tile_image = pygame.transform.scale(tile_image, (constants.TILE_SIZE, constants.TILE_SIZE))
+    tile_list.append(tile_image)
+
 mob_animations = []
 mob_types = ["shooter", "villain"]
 player_index = 0
@@ -97,6 +108,19 @@ def display_info():
     
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
 
+world_data = []
+for row in range(constants.ROWS):
+    r = [-1] * constants.COLS
+    world_data.append(r)
+
+with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+    reader = csv.reader(csvfile, delimiter = ',')
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
+world = World()
+world.process_data(world_data, tile_list)
 
 
 class DamageText(pygame.sprite.Sprite):
@@ -203,6 +227,8 @@ while running:
             hit_fx.play()
     damage_text_group.update()
     item_group.update(player)
+
+    world.draw(screen)
 
     player.draw(screen)
     
