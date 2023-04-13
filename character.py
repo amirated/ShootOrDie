@@ -20,6 +20,8 @@ class Character():
         self.rect.center = (x, y)
     
     def move(self, dx, dy):
+        screen_scroll = [0, 0]
+
         self.running = False
         #control diagonal speed
         if dx != 0 or dy != 0:
@@ -47,6 +49,22 @@ class Character():
                 self.direction = 90
         self.rect.x += dx
         self.rect.y += dy
+
+        if self.char_type == 0:
+            if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X):
+                screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X) - self.rect.right
+                self.rect.right = constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X
+            if self.rect.left < constants.SCROLL_THRESH_X:
+                screen_scroll[0] = constants.SCROLL_THRESH_X - self.rect.left
+                self.rect.left = constants.SCROLL_THRESH_X
+        
+            if self.rect.bottom > (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH_Y):
+                screen_scroll[1] = (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH_Y) - self.rect.bottom
+                self.rect.bottom = constants.SCREEN_HEIGHT - constants.SCROLL_THRESH_Y
+            if self.rect.top < constants.SCROLL_THRESH_Y:
+                screen_scroll[1] = constants.SCROLL_THRESH_Y - self.rect.top
+                self.rect.top = constants.SCROLL_THRESH_Y
+        return screen_scroll
 
     def update(self):
         if self.health <= 0:

@@ -17,6 +17,7 @@ pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
 
 level = 1
+screen_scroll = [0, 0]
 
 running = True
 dt = 0
@@ -141,7 +142,7 @@ class DamageText(pygame.sprite.Sprite):
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 # create player
-player = Character(100, 100, 70, mob_animations, player_index)
+player = Character(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2, 70, mob_animations, player_index)
 villain = Character(200, 300, 100, mob_animations, 1)
 gun = Weapon(gun_image, bullet_image)
 
@@ -152,7 +153,7 @@ damage_text_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
-score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images)
+score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
 item_group.add(score_coin)
 
 coin = Item(400, 400, 0, coin_images)
@@ -208,11 +209,13 @@ while running:
             if event.key == pygame.K_d:
                 moving_right = False
 
-    player.move(dx, dy)
+    screen_scroll = player.move(dx, dy)
+    print(screen_scroll)
 
-    player.update()
+    world.update(screen_scroll)
     for villain in villain_list:
         villain.update()
+    player.update()
     
     bullet = gun.update(player)
     if bullet:
@@ -226,7 +229,7 @@ while running:
             damage_text_group.add(damage_text)
             hit_fx.play()
     damage_text_group.update()
-    item_group.update(player)
+    item_group.update(screen_scroll, player)
 
     world.draw(screen)
 
