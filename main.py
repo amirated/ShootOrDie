@@ -59,7 +59,9 @@ for x in range(4):
     img = scale_img(pygame.image.load(f"assets/images/items/aid_f{x}.png").convert_alpha(), constants.ITEM_SCALE)
     aid_images.append(img)
 
-
+item_images = []
+item_images.append(coin_images)
+item_images.append(aid_images)
 
 def create_bullet():
     print("bullet created")
@@ -107,6 +109,8 @@ def display_info():
         else:
             screen.blit(life_empty, (10 + (i * 50), 0))
     
+    draw_text("LEVEL: " + str(level), font, constants.WHITE, constants.SCREEN_WIDTH / 2, 15)
+
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
 
 world_data = []
@@ -121,7 +125,7 @@ with open(f"levels/level{level}_data.csv", newline="") as csvfile:
             world_data[x][y] = int(tile)
 
 world = World()
-world.process_data(world_data, tile_list)
+world.process_data(world_data, tile_list, item_images, mob_animations)
 
 
 class DamageText(pygame.sprite.Sprite):
@@ -133,6 +137,9 @@ class DamageText(pygame.sprite.Sprite):
         self.counter = 0
     
     def update(self):
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        
         self.rect.y -= 1
         self.counter += 1
         if self.counter > 30:
@@ -142,12 +149,10 @@ class DamageText(pygame.sprite.Sprite):
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 # create player
-player = Character(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2, 70, mob_animations, player_index)
-villain = Character(200, 300, 100, mob_animations, 1)
+player = world.player
 gun = Weapon(gun_image, bullet_image)
 
-villain_list = []
-villain_list.append(villain)
+villain_list = world.character_list
 
 damage_text_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
@@ -156,10 +161,8 @@ item_group = pygame.sprite.Group()
 score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
 item_group.add(score_coin)
 
-coin = Item(400, 400, 0, coin_images)
-item_group.add(coin)
-aid = Item(500, 200, 1, aid_images)
-item_group.add(aid)
+for item in world.item_list:
+    item_group.add(item)
 
 while running:
 
@@ -209,11 +212,11 @@ while running:
             if event.key == pygame.K_d:
                 moving_right = False
 
-    screen_scroll = player.move(dx, dy)
-    print(screen_scroll)
+    screen_scroll = player.move(dx, dy, world.obstacle_tiles)
 
     world.update(screen_scroll)
     for villain in villain_list:
+        villain.ai(player, world.obstacle_tiles, screen_scroll)
         villain.update()
     player.update()
     
@@ -223,7 +226,7 @@ while running:
         shot_fx.play()
 
     for bullet in bullet_group:
-        damage, damage_text_pos = bullet.update(villain_list)
+        damage, damage_text_pos = bullet.update(screen_scroll, villain_list)
         if damage:
             damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
             damage_text_group.add(damage_text)

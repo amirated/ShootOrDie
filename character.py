@@ -3,8 +3,9 @@ import constants
 import math
 
 class Character():
-    def __init__(self, x, y, health, mob_animations, char_type):
+    def __init__(self, x, y, health, mob_animations, char_type, boss, size):
         self.char_type = char_type
+        self.boss = boss
         self.score = 0
         self.direction = 0
         self.frame_index = 0
@@ -14,12 +15,14 @@ class Character():
         self.running = False
         self.health = health
         self.alive = True
+        self.hit = False
+        self.last_hit = pygame.time.get_ticks()
 
         self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0, 0, constants.CHAR_SIZE * constants.SCALE, constants.CHAR_SIZE * constants.SCALE)
+        self.rect = pygame.Rect(0, 0, constants.CHAR_SIZE * size, constants.CHAR_SIZE * size)
         self.rect.center = (x, y)
     
-    def move(self, dx, dy):
+    def move(self, dx, dy, obstacle_tiles):
         screen_scroll = [0, 0]
 
         self.running = False
@@ -47,9 +50,23 @@ class Character():
                 self.direction = 270
             elif dx < 0:
                 self.direction = 90
+        
         self.rect.x += dx
-        self.rect.y += dy
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                if dx > 0:
+                    self.rect.right = obstacle[1].left
+                if dx < 0:
+                    self.rect.left = obstacle[1].right
 
+        self.rect.y += dy
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                if dy > 0:
+                    self.rect.bottom = obstacle[1].top
+                if dy < 0:
+                    self.rect.top = obstacle[1].bottom
+        
         if self.char_type == 0:
             if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X):
                 screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X) - self.rect.right
@@ -65,6 +82,32 @@ class Character():
                 screen_scroll[1] = constants.SCROLL_THRESH_Y - self.rect.top
                 self.rect.top = constants.SCROLL_THRESH_Y
         return screen_scroll
+    
+    def ai(self, player, obstacle_tiles, screen_scroll):
+        clipped_line = ()
+        ai_dx = 0
+        ai_dy = 0
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
+        line_of_sight = ((self.rect.centerx, self.rect.centery), (player.rect.centerx, player.rect.centery))
+        for obstacle in obstacle_tiles:
+            if obstacle[1].clipline(line_of_sight):
+                clipped_line = obstacle[1].clipline(line_of_sight)
+
+        distance = math.sqrt(((self.rect.centerx - player.rect.centerx) ** 2) + ((self.rect.centerx - player.rect.centerx) ** 2))
+        if not clipped_line and distance > constants.RANGE:
+            if self.rect.centerx > player.rect.centerx:
+                ai_dx = -constants.VILLAIN_SPEED
+            if self.rect.centerx < player.rect.centerx:
+                ai_dx = constants.VILLAIN_SPEED
+            if self.rect.centery > player.rect.centery:
+                ai_dy = -constants.VILLAIN_SPEED
+            if self.rect.centery < player.rect.centery:
+                ai_dy = constants.VILLAIN_SPEED
+        
+        self.move(ai_dx, ai_dy, obstacle_tiles)
+
 
     def update(self):
         if self.health <= 0:
