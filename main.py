@@ -68,6 +68,7 @@ def create_bullet():
 
 gun_image = pygame.image.load("assets/images/weapons/gun/0.png").convert_alpha()
 bullet_image = pygame.image.load("assets/images/weapons/bullet.png").convert_alpha()
+villain_bullet_image = pygame.image.load("assets/images/weapons/villain_bullet.png").convert_alpha()
 
 tile_list = []
 for x in range(constants.TILE_TYPES):
@@ -217,12 +218,16 @@ while running:
 
     world.update(screen_scroll)
     for villain in villain_list:
-        villain.ai(player, world.obstacle_tiles, screen_scroll)
-        villain.update()
-        villain_bullet = gun.update(villain)
-        if villain_bullet:
-            villain_bullet_group.add(villain_bullet)
-            shot_fx.play()
+        villain_bullet = villain.ai(player, world.obstacle_tiles, screen_scroll, villain_bullet_image)
+        # villain_bullet = gun.update(villain)
+        if villain.alive:
+            villain.update()
+            if villain_bullet:
+                villain_bullet_group.add(villain_bullet)
+                shot_fx.play()
+        else:
+            villain_list.remove(villain)
+            # villain.kill()
 
     player.update()
     
@@ -232,19 +237,20 @@ while running:
         shot_fx.play()
 
     for bullet in bullet_group:
-        damage, damage_text_pos = bullet.update(screen_scroll, villain_list)
+        damage, damage_text_pos = bullet.update(screen_scroll, world.obstacle_tiles, villain_list)
         if damage:
             damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
             damage_text_group.add(damage_text)
             hit_fx.play()
     
     for villain_bullet in villain_bullet_group:
-        damage, damage_text_pos = villain_bullet.update(screen_scroll, [player])
+        damage, damage_text_pos = villain_bullet.update(screen_scroll, world.obstacle_tiles, player)
         if damage:
             damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
             damage_text_group.add(damage_text)
             hit_fx.play()
     damage_text_group.update()
+    villain_bullet_group.update(screen_scroll, world.obstacle_tiles, player)
     item_group.update(screen_scroll, player)
 
     world.draw(screen)

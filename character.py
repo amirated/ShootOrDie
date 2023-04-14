@@ -1,4 +1,5 @@
 import pygame
+import weapon
 import constants
 import math
 
@@ -17,6 +18,7 @@ class Character():
         self.alive = True
         self.hit = False
         self.last_hit = pygame.time.get_ticks()
+        self.last_attack = pygame.time.get_ticks()
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = pygame.Rect(0, 0, constants.CHAR_SIZE * size, constants.CHAR_SIZE * size)
@@ -83,10 +85,11 @@ class Character():
                 self.rect.top = constants.SCROLL_THRESH_Y
         return screen_scroll
     
-    def ai(self, player, obstacle_tiles, screen_scroll):
+    def ai(self, player, obstacle_tiles, screen_scroll, villain_bullet_image):
         clipped_line = ()
         ai_dx = 0
         ai_dy = 0
+        villain_bullet = None
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
 
@@ -96,7 +99,7 @@ class Character():
                 clipped_line = obstacle[1].clipline(line_of_sight)
 
         distance = math.sqrt(((self.rect.centerx - player.rect.centerx) ** 2) + ((self.rect.centerx - player.rect.centerx) ** 2))
-        if not clipped_line and distance > constants.RANGE:
+        if not clipped_line and distance > constants.NEAR_RANGE and distance < constants.FAR_RANGE:
             if self.rect.centerx > player.rect.centerx:
                 ai_dx = -constants.VILLAIN_SPEED
             if self.rect.centerx < player.rect.centerx:
@@ -105,8 +108,14 @@ class Character():
                 ai_dy = -constants.VILLAIN_SPEED
             if self.rect.centery < player.rect.centery:
                 ai_dy = constants.VILLAIN_SPEED
-        
-        self.move(ai_dx, ai_dy, obstacle_tiles)
+        if self.alive:
+            self.move(ai_dx, ai_dy, obstacle_tiles)
+            villain_bullet_cooldown = 1000
+            if not clipped_line and distance < constants.FAR_RANGE:
+                if pygame.time.get_ticks() - self.last_attack >= villain_bullet_cooldown:
+                    villain_bullet = weapon.VillainBullet(self.rect.centerx, self.rect.centery, villain_bullet_image, player.rect.centerx, player.rect.centery, self.direction)
+                    self.last_attack = pygame.time.get_ticks()
+        return villain_bullet
 
 
     def update(self):
