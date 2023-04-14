@@ -13,23 +13,46 @@ class Weapon():
         self.fired = False
         self.last_shot = pygame.time.get_ticks()
     
-    def update(self, player):
+    # def update(self, character):
+    #     shot_cooldown = 500
+    #     bullet = None
+    #     self.rect.center = character.rect.center
+        
+    #     pos = pygame.mouse.get_pos()
+    #     x_dist = pos[0] - self.rect.centerx
+    #     y_dist = -(pos[1] - self.rect.centery)
+    #     self.direction = math.degrees(math.atan2(y_dist, x_dist))
+
+    #     if pygame.mouse.get_pressed()[0] and self.fired == False and (pygame.time.get_ticks() - self.last_shot) >= shot_cooldown:
+    #         self.fired = True
+    #         bullet = Bullet(self.rect.centerx, self.rect.centery, self.bullet_image, self.direction)
+    #         self.last_shot = pygame.time.get_ticks()
+        
+    #     if pygame.mouse.get_pressed()[0] == False:
+    #         self.fired = False
+        
+    #     return bullet
+    
+    def update(self, character):
         shot_cooldown = 500
         bullet = None
-        self.rect.center = player.rect.center
-        
-        pos = pygame.mouse.get_pos()
-        x_dist = pos[0] - self.rect.centerx
-        y_dist = -(pos[1] - self.rect.centery)
-        self.direction = math.degrees(math.atan2(y_dist, x_dist))
+        self.rect.center = character.rect.center
+        self.direction = character.direction + 90
+        if character.char_type == 0:
+            if pygame.mouse.get_pressed()[0] and self.fired == False and (pygame.time.get_ticks() - self.last_shot) >= shot_cooldown:
+                self.fired = True
+                bullet = Bullet(self.rect.centerx, self.rect.centery, self.bullet_image, self.direction)
+                self.last_shot = pygame.time.get_ticks()
+            
+            if pygame.mouse.get_pressed()[0] == False:
+                self.fired = False
+        if character.char_type == 1:
+            if self.fired == False and (pygame.time.get_ticks() - self.last_shot) >= shot_cooldown:
+                self.fired = True
+                bullet = Bullet(self.rect.centerx, self.rect.centery, self.bullet_image, self.direction)
+                self.last_shot = pygame.time.get_ticks()
 
-        if pygame.mouse.get_pressed()[0] and self.fired == False and (pygame.time.get_ticks() - self.last_shot) >= shot_cooldown:
-            self.fired = True
-            bullet = Bullet(self.rect.centerx, self.rect.centery, self.bullet_image, self.direction)
-            self.last_shot = pygame.time.get_ticks()
-        
-        if pygame.mouse.get_pressed()[0] == False:
-            self.fired = False
+                self.fired = False
         
         return bullet
 

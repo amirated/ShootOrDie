@@ -156,6 +156,7 @@ villain_list = world.character_list
 
 damage_text_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
+villain_bullet_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
@@ -218,6 +219,11 @@ while running:
     for villain in villain_list:
         villain.ai(player, world.obstacle_tiles, screen_scroll)
         villain.update()
+        villain_bullet = gun.update(villain)
+        if villain_bullet:
+            villain_bullet_group.add(villain_bullet)
+            shot_fx.play()
+
     player.update()
     
     bullet = gun.update(player)
@@ -227,6 +233,13 @@ while running:
 
     for bullet in bullet_group:
         damage, damage_text_pos = bullet.update(screen_scroll, villain_list)
+        if damage:
+            damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
+            damage_text_group.add(damage_text)
+            hit_fx.play()
+    
+    for villain_bullet in villain_bullet_group:
+        damage, damage_text_pos = villain_bullet.update(screen_scroll, [player])
         if damage:
             damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
             damage_text_group.add(damage_text)
@@ -245,6 +258,9 @@ while running:
     
     for bullet in bullet_group:
         bullet.draw(screen)
+    
+    for villain_bullet in villain_bullet_group:
+        villain_bullet.draw(screen)
     
     damage_text_group.draw(screen)
     item_group.draw(screen)
