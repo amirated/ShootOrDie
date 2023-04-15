@@ -17,6 +17,7 @@ pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
 
 level = 1
+start_intro = True
 screen_scroll = [0, 0]
 
 running = True
@@ -114,6 +115,19 @@ def display_info():
 
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
 
+
+def reset_level():
+    damage_text_group.empty()
+    bullet_group.empty()
+    villain_bullet_group.empty()
+    item_group.empty()
+    w_data = []
+    for row in range(constants.ROWS):
+        r = [-1] * constants.COLS
+        w_data.append(r)
+    return w_data
+
+
 world_data = []
 for row in range(constants.ROWS):
     r = [-1] * constants.COLS
@@ -147,6 +161,23 @@ class DamageText(pygame.sprite.Sprite):
             self.kill()
 
 
+class ScreenFade():
+    def __init__(self, direction, color, speed):
+        self.direction = direction
+        self.color = color
+        self.speed = speed
+        self.fade_counter = 0
+    
+    def fade(self):
+        fade_complete = False
+        self.fade_counter += self.speed
+        if self.direction == 1:
+            pygame.draw.rect(screen, self.color, (0 - self.fade_counter, 0, constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT))
+            pygame.draw.rect(screen, self.color, (constants.SCREEN_WIDTH // 2 + self.fade_counter, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+        if self.fade_counter >= constants.SCREEN_WIDTH:
+            fade_complete = True
+        return fade_complete
+
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 # create player
@@ -165,6 +196,8 @@ item_group.add(score_coin)
 
 for item in world.item_list:
     item_group.add(item)
+
+intro_fade = ScreenFade(1, constants.BLACK, 4)
 
 while running:
 
@@ -214,8 +247,8 @@ while running:
             if event.key == pygame.K_d:
                 moving_right = False
 
-    screen_scroll = player.move(dx, dy, world.obstacle_tiles)
-
+    screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
+    
     world.update(screen_scroll)
     for villain in villain_list:
         villain_bullet = villain.ai(player, world.obstacle_tiles, screen_scroll, villain_bullet_image)
@@ -272,6 +305,37 @@ while running:
     item_group.draw(screen)
     display_info()
     score_coin.draw(screen)
+
+    if level_complete == True:
+        start_intro = True
+        level += 1
+        world_data = reset_level()
+        # level_complete = False
+        with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter = ',')
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    world_data[x][y] = int(tile)
+
+        world = World()
+        world.process_data(world_data, tile_list, item_images, mob_animations)
+        temp_health = player.health
+        temp_score = player.score
+        player = world.player
+        player.health = temp_health
+        player.score = temp_score
+
+        villain_list = world.character_list
+        score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
+        item_group.add(score_coin)
+
+        for item in world.item_list:
+            item_group.add(item)
+
+    if start_intro == True:
+        if intro_fade.fade():
+            start_intro = False
+            intro_fade.fade_counter = 0
 
     pygame.display.flip()
 
