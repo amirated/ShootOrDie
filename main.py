@@ -54,6 +54,7 @@ exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_ex
 restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
 resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
 menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
+pause_background_image = pygame.image.load("assets/images/pause_background_image.png")
 game_over_background_image = pygame.image.load("assets/images/game_over_background_image.png")
 
 life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").convert_alpha(), constants.ITEM_SCALE)
@@ -236,7 +237,7 @@ while running:
             if music_playing == True:
                 music_playing = False
                 pygame.mixer.music.pause()
-            screen.fill(constants.BG)
+            screen.blit(pause_background_image, (0, 0))
             if resume_button.draw(screen):
                 if music_playing == False:
                     music_playing = True
