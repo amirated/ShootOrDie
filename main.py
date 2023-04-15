@@ -303,7 +303,7 @@ while running:
                         damage_text_group.add(damage_text)
                         hit_fx.play()
                 damage_text_group.update()
-                villain_bullet_group.update(screen_scroll, world.obstacle_tiles, player)
+                # villain_bullet_group.update(screen_scroll, world.obstacle_tiles, player)
                 item_group.update(screen_scroll, player)
 
             # draw stuff
