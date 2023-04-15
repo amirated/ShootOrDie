@@ -53,6 +53,8 @@ start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_s
 exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.BUTTON_SCALE)
 restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
 resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
+menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
+game_over_background_image = pygame.image.load("assets/images/game_over_background_image.png")
 
 life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").convert_alpha(), constants.ITEM_SCALE)
 life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").convert_alpha(), constants.ITEM_SCALE)
@@ -169,7 +171,7 @@ class DamageText(pygame.sprite.Sprite):
             self.kill()
 
 
-class ScreenFade():
+class ScreenTransition():
     def __init__(self, direction, color, speed):
         self.direction = direction
         self.color = color
@@ -208,13 +210,13 @@ item_group.add(score_coin)
 for item in world.item_list:
     item_group.add(item)
 
-intro_fade = ScreenFade(1, constants.BLACK, 4)
-death_fade = ScreenFade(2, constants.BLACK, 4)
+intro_fade = ScreenTransition(1, constants.BLACK, 40)
+death_fade = ScreenTransition(2, constants.BLACK, 40)
 
-start_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 100, start_button_image)
-exit_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, exit_button_image)
-restart_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 200, restart_button_image)
-resume_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 300, resume_button_image)
+start_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, start_button_image)
+restart_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, restart_button_image)
+resume_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, resume_button_image)
+exit_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 + 100, exit_button_image)
 
 while running:
 
@@ -223,6 +225,7 @@ while running:
     # independent physics.
     dt = clock.tick(constants.FPS) / 1000
     if start_game == False:
+        screen.blit(menu_background_image, (0, 0))
         if start_button.draw(screen):
             start_game = True
             start_intro = True
@@ -354,7 +357,9 @@ while running:
                     intro_fade.fade_counter = 0
 
             if player.alive == False:
+                game_over_background_image
                 if death_fade.fade():
+                    screen.blit(game_over_background_image, (0, 0))
                     if restart_button.draw(screen):
                         death_fade.fade_counter = 0
                         start_intro = True
@@ -378,6 +383,8 @@ while running:
 
                         for item in world.item_list:
                             item_group.add(item)
+                    if exit_button.draw(screen):
+                        running = False
 
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
