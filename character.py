@@ -9,8 +9,8 @@ class Character():
         self.boss = boss
         self.score = 0
         self.direction = 0
-        self.speed_boost = 0
-        self.speed_boost_update_time = pygame.time.get_ticks()
+        self.speed_mod = 0
+        self.speed_mod_update_time = pygame.time.get_ticks()
         self.frame_index = 0
         self.action = 0 # 0: idle, 1: run
         self.animation_list = mob_animations[char_type]
@@ -146,11 +146,11 @@ class Character():
             self.frame_index = 0
         
         # update to remove speed boost
-        boost_expiry = 9000
-        if not self.speed_boost == 0:
-            if pygame.time.get_ticks() - self.speed_boost_update_time > boost_expiry:
-                self.speed_boost = 0
-                self.speed_boost_update_time = pygame.time.get_ticks()
+        speed_mod_expiry = 9000
+        if not self.speed_mod == 0:
+            if pygame.time.get_ticks() - self.speed_mod_update_time > speed_mod_expiry:
+                self.speed_mod = 0
+                self.speed_mod_update_time = pygame.time.get_ticks()
 
 
     def update_action(self, new_action):

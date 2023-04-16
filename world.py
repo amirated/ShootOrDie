@@ -45,6 +45,10 @@ class World():
                     blaze = Item(image_x, image_y, 2, item_images[2])
                     self.item_list.append(blaze)
                     tile_data[0] = tile_list[0]
+                elif tile == 15: # flagger
+                    flagger = Item(image_x, image_y, 3, item_images[3])
+                    self.item_list.append(flagger)
+                    tile_data[0] = tile_list[0]
                 if tile >= 0:
                     self.map_tiles.append(tile_data)
 

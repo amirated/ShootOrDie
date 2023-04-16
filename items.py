@@ -25,7 +25,9 @@ class Item(pygame.sprite.Sprite):
                 if player.health > 100:
                     player.health = 100
             elif self.item_type == 2:
-                player.speed_boost = 3
+                player.speed_mod = 3
+            elif self.item_type == 3:
+                player.speed_mod = -2
             self.kill()
 
         animation_cooldown = 300

@@ -12,7 +12,7 @@ SHOOTER_DIAG_OFFSET = 25
 
 TILE_SIZE = 32 * SCALE_3
 CHAR_SIZE = 32
-TILE_TYPES = 15
+TILE_TYPES = 16
 ROWS = 30
 COLS = 60
 SCROLL_THRESH_X = 500
@@ -21,8 +21,8 @@ NEAR_RANGE = 50
 FAR_RANGE = 1000
 LINE_OF_SIGHT = 500
 
-SPEED = 3
-BLAZE_SPEED = SPEED + 2
+SPEED = 4
+
 BULLET_SPEED = 10
 VILLAIN_BULLET_SPEED = 3
 VILLAIN_SPEED = SPEED - 1
@@ -34,3 +34,10 @@ BLACK = (0, 0, 0)
 BG = (40, 25, 25)
 
 PANEL = (50, 50, 50)
+
+TIPS = [
+    "You can use combinations of W,A,S,D to move diagonally. Enjoy surviving!",
+    "The villains won't come to you if there is a wall in between.",
+    "The blaze will make you faster. But will expire in 9 seconds.",
+    "Avoid the flaggers as much as you can. They slow you down. It's good that their effects don't last forever!"
+]

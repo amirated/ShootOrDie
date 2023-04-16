@@ -1,4 +1,6 @@
 import pygame
+import random
+
 import csv
 from pygame import mixer
 import constants
@@ -17,6 +19,7 @@ screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGH
 pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
 
+tip_of_the_session = constants.TIPS[random.randint(0, len(constants.TIPS) - 1)]
 level = 1
 start_game = False
 pause_game = False
@@ -90,13 +93,16 @@ for x in range(4):
     img = scale_img(pygame.image.load(f"assets/images/items/blaze_f{x}.png").convert_alpha(), constants.SCALE_2)
     blaze_images.append(img)
 
+flagger_images = []
+for x in range(4):
+    img = scale_img(pygame.image.load(f"assets/images/items/flagger_f{x}.png").convert_alpha(), constants.SCALE_2)
+    flagger_images.append(img)
+
 item_images = []
 item_images.append(coin_images)
 item_images.append(aid_images)
 item_images.append(blaze_images)
-
-def create_bullet():
-    print("bullet created")
+item_images.append(flagger_images)
 
 gun_image = pygame.image.load("assets/images/weapons/gun/0.png").convert_alpha()
 bullet_image = pygame.image.load("assets/images/weapons/bullet.png").convert_alpha()
@@ -151,7 +157,7 @@ def display_controls():
     draw_text("Player controls:", font, constants.WHITE, 120, 120)
     draw_text("MOVE: W, A, S, D", font, constants.WHITE, 140, 140)
     draw_text("SHOOT: Mouse Left", font, constants.WHITE, 140, 160)
-    draw_text("TIP: You can use combinations of W,A,S,D to move diagonally. Enjoy surviving!", font, constants.WHITE, 120, 300)
+    draw_text(f"TIP: {tip_of_the_session}", font, constants.WHITE, 120, 300)
 
 def reset_level():
     death_fx_played = False
@@ -291,13 +297,13 @@ while running:
                 dy = 0
                 
                 if moving_right == True:
-                    dx = (constants.SPEED + player.speed_boost)
+                    dx = (constants.SPEED + player.speed_mod)
                 if moving_left == True:
-                    dx = -(constants.SPEED + player.speed_boost)
+                    dx = -(constants.SPEED + player.speed_mod)
                 if moving_up == True:
-                    dy = -(constants.SPEED + player.speed_boost)
+                    dy = -(constants.SPEED + player.speed_mod)
                 if moving_down == True:
-                    dy = (constants.SPEED + player.speed_boost)
+                    dy = (constants.SPEED + player.speed_mod)
             
 
                 screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
