@@ -61,33 +61,39 @@ hit_fx.set_volume(0.2)
 death_fx = pygame.mixer.Sound("assets/audio/death_fx.wav")
 death_fx.set_volume(0.8)
 
-start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_start.png").convert_alpha(), constants.BUTTON_SCALE)
-exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.BUTTON_SCALE)
-restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
-resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
-controls_button_image = scale_img(pygame.image.load("assets/images/buttons/button_controls.png").convert_alpha(), constants.BUTTON_SCALE)
+start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_start.png").convert_alpha(), constants.SCALE_1)
+exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.SCALE_1)
+restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.SCALE_1)
+resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.SCALE_1)
+controls_button_image = scale_img(pygame.image.load("assets/images/buttons/button_controls.png").convert_alpha(), constants.SCALE_1)
 
 menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
 pause_background_image = pygame.image.load("assets/images/pause_background_image.png")
 game_over_background_image = pygame.image.load("assets/images/game_over_background_image.png")
 
-life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").convert_alpha(), constants.ITEM_SCALE)
-life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").convert_alpha(), constants.ITEM_SCALE)
-life_full = scale_img(pygame.image.load("assets/images/items/life_full.png").convert_alpha(), constants.ITEM_SCALE)
+life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").convert_alpha(), constants.SCALE_3)
+life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").convert_alpha(), constants.SCALE_3)
+life_full = scale_img(pygame.image.load("assets/images/items/life_full.png").convert_alpha(), constants.SCALE_3)
 
 coin_images = []
 for x in range(4):
-    img = scale_img(pygame.image.load(f"assets/images/items/coin_f{x}.png").convert_alpha(), constants.ITEM_SCALE)
+    img = scale_img(pygame.image.load(f"assets/images/items/coin_f{x}.png").convert_alpha(), constants.SCALE_3)
     coin_images.append(img)
 
 aid_images = []
 for x in range(4):
-    img = scale_img(pygame.image.load(f"assets/images/items/aid_f{x}.png").convert_alpha(), constants.ITEM_SCALE)
+    img = scale_img(pygame.image.load(f"assets/images/items/aid_f{x}.png").convert_alpha(), constants.SCALE_3)
     aid_images.append(img)
+
+blaze_images = []
+for x in range(4):
+    img = scale_img(pygame.image.load(f"assets/images/items/blaze_f{x}.png").convert_alpha(), constants.SCALE_2)
+    blaze_images.append(img)
 
 item_images = []
 item_images.append(coin_images)
 item_images.append(aid_images)
+item_images.append(blaze_images)
 
 def create_bullet():
     print("bullet created")
@@ -113,7 +119,7 @@ for mob in mob_types:
     for animation in animation_types:
         temp_list = []
         for i in range(4):
-            img = scale_img(pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha(), constants.SCALE)
+            img = scale_img(pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha(), constants.SCALE_2)
             temp_list.append(img)
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
@@ -285,13 +291,13 @@ while running:
                 dy = 0
                 
                 if moving_right == True:
-                    dx = constants.SPEED
+                    dx = (constants.SPEED + player.speed_boost)
                 if moving_left == True:
-                    dx = -constants.SPEED
+                    dx = -(constants.SPEED + player.speed_boost)
                 if moving_up == True:
-                    dy = -constants.SPEED
+                    dy = -(constants.SPEED + player.speed_boost)
                 if moving_down == True:
-                    dy = constants.SPEED
+                    dy = (constants.SPEED + player.speed_boost)
             
 
                 screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)

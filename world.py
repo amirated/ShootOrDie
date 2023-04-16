@@ -41,6 +41,10 @@ class World():
                     villain = Character(image_x, image_y, 100, mob_animations, 1, False, 2)
                     self.character_list.append(villain)
                     tile_data[0] = tile_list[0]
+                elif tile == 14: # blaze
+                    blaze = Item(image_x, image_y, 2, item_images[2])
+                    self.item_list.append(blaze)
+                    tile_data[0] = tile_list[0]
                 if tile >= 0:
                     self.map_tiles.append(tile_data)
 
