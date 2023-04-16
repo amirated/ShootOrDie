@@ -65,6 +65,7 @@ start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_s
 exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.BUTTON_SCALE)
 restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
 resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
+controls_button_image = scale_img(pygame.image.load("assets/images/buttons/button_controls.png").convert_alpha(), constants.BUTTON_SCALE)
 
 menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
 pause_background_image = pygame.image.load("assets/images/pause_background_image.png")
@@ -138,6 +139,13 @@ def display_info():
     draw_text("LEVEL: " + str(level), font, constants.WHITE, constants.SCREEN_WIDTH / 2, 15)
 
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
+
+def display_controls():
+    pygame.draw.rect(screen, constants.BLACK, (100, 100, constants.SCREEN_WIDTH - 200, 250))
+    draw_text("Player controls:", font, constants.WHITE, 120, 120)
+    draw_text("MOVE: W, A, S, D", font, constants.WHITE, 140, 140)
+    draw_text("SHOOT: Mouse Left", font, constants.WHITE, 140, 160)
+    draw_text("TIP: You can use combinations of W,A,S,D to move diagonally. Enjoy surviving!", font, constants.WHITE, 120, 300)
 
 def reset_level():
     death_fx_played = False
@@ -228,9 +236,10 @@ for item in world.item_list:
 intro_fade = ScreenTransition(1, constants.BLACK, 40)
 death_fade = ScreenTransition(2, constants.BLACK, 40)
 
-start_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, start_button_image)
+start_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 100, start_button_image)
 restart_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, restart_button_image)
-resume_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, resume_button_image)
+resume_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 100, resume_button_image)
+controls_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, controls_button_image)
 exit_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 + 100, exit_button_image)
 
 while running:
@@ -248,6 +257,8 @@ while running:
             start_game = True
             start_intro = True
             music_playing = False
+        if controls_button.draw(screen):
+            display_controls()
         if exit_button.draw(screen):
             running = False
             music_playing = False
@@ -257,6 +268,8 @@ while running:
             if resume_button.draw(screen):
                 play_music('suspense')
                 pause_game = False
+            if controls_button.draw(screen):
+                display_controls()
             if exit_button.draw(screen):
                 running = False
         else:
