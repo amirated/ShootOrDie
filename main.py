@@ -41,18 +41,31 @@ def scale_img(image, scale):
     h = image.get_height()
     return pygame.transform.scale(image, (w * scale, h * scale))
 
-pygame.mixer.music.load("assets/audio/suspense.wav")
-pygame.mixer.music.set_volume(0.3)
 music_playing = False
+death_fx_played = False
+
+def play_music(music_label):
+    print("play music " + music_label)
+    # start_game_music
+    # suspense
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
+    pygame.mixer.music.load(f"assets/audio/{music_label}.wav")
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1, 0.0, 500)
+
 shot_fx = pygame.mixer.Sound("assets/audio/shot_fx.wav")
 shot_fx.set_volume(0.5)
 hit_fx = pygame.mixer.Sound("assets/audio/hit_fx.wav")
 hit_fx.set_volume(0.2)
+death_fx = pygame.mixer.Sound("assets/audio/death_fx.wav")
+death_fx.set_volume(0.8)
 
 start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_start.png").convert_alpha(), constants.BUTTON_SCALE)
 exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.BUTTON_SCALE)
 restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
 resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
+
 menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
 pause_background_image = pygame.image.load("assets/images/pause_background_image.png")
 game_over_background_image = pygame.image.load("assets/images/game_over_background_image.png")
@@ -99,7 +112,7 @@ for mob in mob_types:
     for animation in animation_types:
         temp_list = []
         for i in range(4):
-            img = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
+            img = scale_img(pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha(), constants.SCALE)
             temp_list.append(img)
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
@@ -126,8 +139,9 @@ def display_info():
 
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
 
-
 def reset_level():
+    death_fx_played = False
+    play_music('suspense')
     damage_text_group.empty()
     bullet_group.empty()
     villain_bullet_group.empty()
@@ -226,29 +240,29 @@ while running:
     # independent physics.
     dt = clock.tick(constants.FPS) / 1000
     if start_game == False:
+        if music_playing == False:
+            play_music('start_game_music')
+            music_playing = True
         screen.blit(menu_background_image, (0, 0))
         if start_button.draw(screen):
             start_game = True
             start_intro = True
+            music_playing = False
         if exit_button.draw(screen):
             running = False
+            music_playing = False
     else:
         if pause_game == True:
-            if music_playing == True:
-                music_playing = False
-                pygame.mixer.music.pause()
             screen.blit(pause_background_image, (0, 0))
             if resume_button.draw(screen):
-                if music_playing == False:
-                    music_playing = True
-                    pygame.mixer.music.unpause()
+                play_music('suspense')
                 pause_game = False
             if exit_button.draw(screen):
                 running = False
         else:
             if music_playing == False:
+                play_music('suspense')
                 music_playing = True
-                pygame.mixer.music.play(-1, 0.0, 500)
 
             screen.fill(constants.BG)
             
@@ -303,7 +317,6 @@ while running:
                         damage_text_group.add(damage_text)
                         hit_fx.play()
                 damage_text_group.update()
-                # villain_bullet_group.update(screen_scroll, world.obstacle_tiles, player)
                 item_group.update(screen_scroll, player)
 
             # draw stuff
@@ -358,7 +371,10 @@ while running:
                     intro_fade.fade_counter = 0
 
             if player.alive == False:
-                game_over_background_image
+                if death_fx_played == False:
+                    death_fx.play()
+                    death_fx_played = True
+                    play_music('game_over_music')
                 if death_fade.fade():
                     screen.blit(game_over_background_image, (0, 0))
                     if restart_button.draw(screen):
@@ -403,6 +419,7 @@ while running:
                 moving_right = True
             if event.key == pygame.K_ESCAPE:
                 pause_game = True
+                play_music('pause_music')
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:

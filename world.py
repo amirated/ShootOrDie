@@ -38,7 +38,7 @@ class World():
                     self.player = player
                     tile_data[0] = tile_list[0]
                 elif tile == 12: # villain
-                    villain = Character(image_x, image_y, 100, mob_animations, 1, False, 1)
+                    villain = Character(image_x, image_y, 100, mob_animations, 1, False, 2)
                     self.character_list.append(villain)
                     tile_data[0] = tile_list[0]
                 if tile >= 0:
