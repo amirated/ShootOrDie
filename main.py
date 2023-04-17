@@ -1,5 +1,7 @@
 import pygame
 import random
+import os, pathlib
+import platform
 
 import csv
 from pygame import mixer
@@ -10,6 +12,9 @@ from weapon import Weapon
 from weapon import Bullet
 from items import Item
 from button import Button
+
+if platform.system() == "Darwin":
+    os.chdir(pathlib.Path(os.path.dirname(os.path.abspath(__file__))))
 
 # pygame setup
 mixer.init()
@@ -225,7 +230,13 @@ for row in range(constants.ROWS):
     r = [-1] * constants.COLS
     world_data.append(r)
 
-with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+
+
+cwd = os.getcwd()  # Get the current working directory (cwd)
+files = os.listdir(cwd)  # Get all the files in that directory
+print("Files in %r: %s" % (cwd, files))
+
+with open(f"assets/levels/level{level}_data.csv", newline="") as csvfile:
     reader = csv.reader(csvfile, delimiter = ',')
     for x, row in enumerate(reader):
         for y, tile in enumerate(row):
@@ -438,7 +449,7 @@ while running:
                 
                 world_data = reset_level()
                 # level_complete = False
-                with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+                with open(f"assets/levels/level{level}_data.csv", newline="") as csvfile:
                     reader = csv.reader(csvfile, delimiter = ',')
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
@@ -476,7 +487,7 @@ while running:
                         start_intro = True
                         world_data = reset_level()
                         # level_complete = False
-                        with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+                        with open(f"assets/levels/level{level}_data.csv", newline="") as csvfile:
                             reader = csv.reader(csvfile, delimiter = ',')
                             for x, row in enumerate(reader):
                                 for y, tile in enumerate(row):
