@@ -78,6 +78,8 @@ life_empty = scale_img(pygame.image.load("assets/images/items/life_empty.png").c
 life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").convert_alpha(), constants.SCALE_3)
 life_full = scale_img(pygame.image.load("assets/images/items/life_full.png").convert_alpha(), constants.SCALE_3)
 
+villain_image = scale_img(pygame.image.load(f"assets/images/characters/villain/idle/0.png").convert_alpha(), constants.SCALE_1)
+
 coin_images = []
 for x in range(4):
     img = scale_img(pygame.image.load(f"assets/images/items/coin_f{x}.png").convert_alpha(), constants.SCALE_3)
@@ -150,6 +152,7 @@ def display_info():
     
     draw_text("LEVEL: " + str(level), font, constants.WHITE, constants.SCREEN_WIDTH / 2, 15)
 
+    draw_text(f"X {len(world.villain_list)}", font, constants.WHITE, constants.SCREEN_WIDTH - 200, 15)
     draw_text(f"X {player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
 
 def display_controls():
@@ -243,6 +246,8 @@ damage_text_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 villain_bullet_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
+
+# x, y, health, mob_animations, char_type, boss, size, villain_list
 
 score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
 item_group.add(score_coin)
@@ -368,6 +373,7 @@ while running:
             item_group.draw(screen)
             display_info()
             score_coin.draw(screen)
+            screen.blit(villain_image, (constants.SCREEN_WIDTH - 240, 10))
             if display_message:
                 show_message(display_message)
 
