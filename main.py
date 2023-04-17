@@ -20,10 +20,11 @@ pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
 
 tip_of_the_session = constants.TIPS[random.randint(0, len(constants.TIPS) - 1)]
-level = 1
+level = 7
 start_game = False
 pause_game = False
 start_intro = False
+level_complete = False
 screen_scroll = [0, 0]
 
 running = True
@@ -46,6 +47,8 @@ def scale_img(image, scale):
 
 music_playing = False
 death_fx_played = False
+level_transition_shown = False
+level_clear_fx_played = False
 
 def play_music(music_label):
     print("play music " + music_label)
@@ -63,12 +66,16 @@ hit_fx = pygame.mixer.Sound("assets/audio/hit_fx.wav")
 hit_fx.set_volume(0.2)
 death_fx = pygame.mixer.Sound("assets/audio/death_fx.wav")
 death_fx.set_volume(0.8)
+level_clear_fx = pygame.mixer.Sound("assets/audio/level_clear_fx.wav")
+level_clear_fx.set_volume(0.8)
 
 start_button_image = scale_img(pygame.image.load("assets/images/buttons/button_start.png").convert_alpha(), constants.SCALE_1)
 exit_button_image = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.SCALE_1)
+exit_button_image_white = scale_img(pygame.image.load("assets/images/buttons/button_exit_white.png").convert_alpha(), constants.SCALE_1)
 restart_button_image = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.SCALE_1)
 resume_button_image = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.SCALE_1)
 controls_button_image = scale_img(pygame.image.load("assets/images/buttons/button_controls.png").convert_alpha(), constants.SCALE_1)
+continue_button_image = scale_img(pygame.image.load("assets/images/buttons/button_continue_white.png").convert_alpha(), constants.SCALE_1)
 
 menu_background_image = pygame.image.load("assets/images/menu_background_image.png")
 pause_background_image = pygame.image.load("assets/images/pause_background_image.png")
@@ -79,6 +86,7 @@ life_half = scale_img(pygame.image.load("assets/images/items/life_half.png").con
 life_full = scale_img(pygame.image.load("assets/images/items/life_full.png").convert_alpha(), constants.SCALE_3)
 
 villain_image = scale_img(pygame.image.load(f"assets/images/characters/villain/idle/0.png").convert_alpha(), constants.SCALE_1)
+trophy_image = scale_img(pygame.image.load(f"assets/images/items/trophy_image.png").convert_alpha(), constants.SCALE_2)
 
 coin_images = []
 for x in range(4):
@@ -158,8 +166,9 @@ def display_info():
 def display_controls():
     pygame.draw.rect(screen, constants.BLACK, (100, 100, constants.SCREEN_WIDTH - 200, 250))
     draw_text("Player controls:", font, constants.WHITE, 120, 120)
-    draw_text("MOVE: W, A, S, D", font, constants.WHITE, 140, 140)
-    draw_text("SHOOT: Mouse Left", font, constants.WHITE, 140, 160)
+    draw_text("MOVE: W, A, S, D", font, constants.WHITE, 140, 145)
+    draw_text("SHOOT: Mouse Left", font, constants.WHITE, 140, 170)
+    draw_text("PAUSE: ESC", font, constants.WHITE, 140, 195)
     draw_text(f"TIP: {tip_of_the_session}", font, constants.WHITE, 120, 300)
 
 def show_message(message):
@@ -167,7 +176,37 @@ def show_message(message):
     draw_text(message, font, constants.BLACK, 220, 170)
     # draw_text(message, font, constants.BLACK, 220, 200)
 
+def show_dialog_box(message):
+    continue_button = None
+    exit_button_white = None
+    
+    pygame.draw.rect(screen, constants.WHITE, (200, 100, constants.SCREEN_WIDTH - 400, 180))
+    for i in range(len(message["messages"])):
+        draw_text(message["messages"][i], font, constants.BLACK, 230, 120 + (i * 25))
+    if message["new_item"] == "COINS":
+        screen.blit(coin_images[0], (230, 200))
+        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+    if message["new_item"] == "AID":
+        screen.blit(aid_images[0], (230, 200))
+        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+    if message["new_item"] == "BLAZE":
+        screen.blit(blaze_images[0], (230, 200))
+        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+    if message["new_item"] == "FLAGGER":
+        screen.blit(flagger_images[0], (230, 200))
+        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+    if message["new_item"] == "TROPHY":
+        screen.blit(trophy_image, (220, 200))
+        draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
+        
+    if level == constants.FINAL_LEVEL:
+        exit_button_white = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, exit_button_image_white)
+    else:
+        continue_button = Button(constants.SCREEN_WIDTH // 2 - 100, constants.SCREEN_HEIGHT // 2 - 0, continue_button_image)
+    return continue_button, exit_button_white
+
 def reset_level():
+    level_transition_shown = False
     death_fx_played = False
     play_music('suspense')
     damage_text_group.empty()
@@ -302,57 +341,63 @@ while running:
             screen.fill(constants.BG)
             
             if player.alive:
-                # calculate player movement
-                dx = 0
-                dy = 0
+                if level_complete == True and level_transition_shown == False:
+                    if level_clear_fx_played == False:
+                        pygame.mixer.music.stop()
+                        level_clear_fx.play()
+                        level_clear_fx_played = True
+                else:
+                    # calculate player movement
+                    dx = 0
+                    dy = 0
+                    
+                    if moving_right == True:
+                        dx = (constants.SPEED + player.speed_mod)
+                    if moving_left == True:
+                        dx = -(constants.SPEED + player.speed_mod)
+                    if moving_up == True:
+                        dy = -(constants.SPEED + player.speed_mod)
+                    if moving_down == True:
+                        dy = (constants.SPEED + player.speed_mod)
                 
-                if moving_right == True:
-                    dx = (constants.SPEED + player.speed_mod)
-                if moving_left == True:
-                    dx = -(constants.SPEED + player.speed_mod)
-                if moving_up == True:
-                    dy = -(constants.SPEED + player.speed_mod)
-                if moving_down == True:
-                    dy = (constants.SPEED + player.speed_mod)
-            
 
-                screen_scroll, level_complete, display_message = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
+                    screen_scroll, level_complete, display_message = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
+                    
+                    world.update(screen_scroll)
+                    for villain in villain_list:
+                        villain_bullet = villain.ai(player, world.obstacle_tiles, screen_scroll, villain_bullet_image)
+                        # villain_bullet = gun.update(villain)
+                        if villain.alive:
+                            villain.update()
+                            if villain_bullet:
+                                villain_bullet_group.add(villain_bullet)
+                                shot_fx.play()
+                        else:
+                            villain_list.remove(villain)
+                            # villain.kill()
 
-                world.update(screen_scroll)
-                for villain in villain_list:
-                    villain_bullet = villain.ai(player, world.obstacle_tiles, screen_scroll, villain_bullet_image)
-                    # villain_bullet = gun.update(villain)
-                    if villain.alive:
-                        villain.update()
-                        if villain_bullet:
-                            villain_bullet_group.add(villain_bullet)
-                            shot_fx.play()
-                    else:
-                        villain_list.remove(villain)
-                        # villain.kill()
+                    player.update()
+                    
+                    bullet = gun.update(player)
+                    if bullet:
+                        bullet_group.add(bullet)
+                        shot_fx.play()
 
-                player.update()
+                    for bullet in bullet_group:
+                        damage, damage_text_pos = bullet.update(screen_scroll, world.obstacle_tiles, villain_list)
+                        if damage:
+                            damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
+                            damage_text_group.add(damage_text)
+                            hit_fx.play()
                 
-                bullet = gun.update(player)
-                if bullet:
-                    bullet_group.add(bullet)
-                    shot_fx.play()
-
-                for bullet in bullet_group:
-                    damage, damage_text_pos = bullet.update(screen_scroll, world.obstacle_tiles, villain_list)
-                    if damage:
-                        damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
-                        damage_text_group.add(damage_text)
-                        hit_fx.play()
-            
-                for villain_bullet in villain_bullet_group:
-                    damage, damage_text_pos = villain_bullet.update(screen_scroll, world.obstacle_tiles, player)
-                    if damage:
-                        damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
-                        damage_text_group.add(damage_text)
-                        hit_fx.play()
-                damage_text_group.update()
-                item_group.update(screen_scroll, player)
+                    for villain_bullet in villain_bullet_group:
+                        damage, damage_text_pos = villain_bullet.update(screen_scroll, world.obstacle_tiles, player)
+                        if damage:
+                            damage_text = DamageText(damage_text_pos.centerx, damage_text_pos.y, str(damage), constants.WHITE)
+                            damage_text_group.add(damage_text)
+                            hit_fx.play()
+                    damage_text_group.update()
+                    item_group.update(screen_scroll, player)
 
             # draw stuff
             world.draw(screen)
@@ -376,10 +421,21 @@ while running:
             screen.blit(villain_image, (constants.SCREEN_WIDTH - 240, 10))
             if display_message:
                 show_message(display_message)
+            
+            if level_complete == True and level_transition_shown == False:
+                continue_button, exit_button_white = show_dialog_box(constants.LEVEL_CLEAR_MESSAGE[level - 1])
+                if not exit_button_white == None:
+                    if exit_button_white.draw(screen):
+                        running = False 
+                if not continue_button == None:
+                    if continue_button.draw(screen):
+                        level_transition_shown = True
 
-            if level_complete == True:
+            if level_complete == True and level_transition_shown == True:
                 start_intro = True
                 level += 1
+                # show level transition screen
+                
                 world_data = reset_level()
                 # level_complete = False
                 with open(f"levels/level{level}_data.csv", newline="") as csvfile:

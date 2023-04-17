@@ -82,7 +82,6 @@ class Character():
                     if len(self.world_villain_list) > 0:
                         display_message = "Portal locked! Destroy all villains to unlock this portal."
                     else:
-                        display_message = "Level complete!"
                         level_complete = True
             if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X):
                 screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X) - self.rect.right
