@@ -14,6 +14,39 @@
         "#floor": {
             "scaleInDock": 1
         },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level5_data.tmj": {
+            "scale": 0.6153,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 627.3362587355762,
+                "y": 492.44271087274507
+            }
+        },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level5_data.tmj#floor": {
+            "scaleInDock": 1
+        },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level6_data.tmj": {
+            "scale": 0.859,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 575.0873108265425,
+                "y": 448.1955762514552
+            }
+        },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level6_data.tmj#floor": {
+            "scaleInDock": 1
+        },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level7_data.tmj": {
+            "scale": 0.6301,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 618.9493731153784,
+                "y": 388.8271702904301
+            }
+        },
+        "/Users/amitesh/codes/hackathon_PyGame/assets/levels/level7_data.tmj#floor": {
+            "scaleInDock": 1
+        },
         "/Users/amitesh/codes/hackathon_PyGame/levels/level1_data.tmj": {
             "scale": 0.5935,
             "selectedLayer": 0,
@@ -92,7 +125,7 @@
             "scaleInDock": 1
         }
     },
-    "last.exportedFilePath": "/Users/amitesh/codes/hackathon_PyGame/levels",
+    "last.exportedFilePath": "/Users/amitesh/codes/hackathon_PyGame/assets/levels",
     "last.imagePath": "/Users/amitesh/codes/hackathon_PyGame/assets/images/tiles",
     "map.height": 30,
     "map.lastUsedExportFilter": "CSV files (*.csv)",

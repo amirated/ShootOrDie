@@ -17,14 +17,14 @@ ROWS = 30
 COLS = 60
 SCROLL_THRESH_X = 500
 SCROLL_THRESH_Y = 300
-NEAR_RANGE = 50
+NEAR_RANGE = 10
 FAR_RANGE = 1000
 LINE_OF_SIGHT = 500
 
 SPEED = 4
 
 BULLET_SPEED = 10
-VILLAIN_BULLET_SPEED = 3
+VILLAIN_BULLET_SPEED = 4
 VILLAIN_SPEED = SPEED - 1
 DIAGONAL_COEFFICIENT = (math.sqrt(2)/2)
 
@@ -64,12 +64,14 @@ LEVEL_CLEAR_MESSAGE = [
         "new_item_description": "Regain your lost health by collecting these health pills."
     },
     {
-        "messages": ["Level 5 finished"],
-        "new_item": ""
+        "messages": ["God job! That was quite a war.", "Keep believing in yourself."],
+        "new_item": "BLAZE",
+        "new_item_description": "Blaze will give you the speed you always wanted."
     },
     {
-        "messages": ["Level 6 finished"],
-        "new_item": ""
+        "messages": ["The good must win against all evil.", "It's time to buckle up for the final showdown.", "All the best agent."],
+        "new_item": "FLAGGER",
+        "new_item_description": "Beware of these flaggers. They will slow you down."
     },
     {
         "messages": ["You have successfully finished the game. The agency is proud to have an agent like you.", "Keep in touch and we will bring more challenging missions in the future."],

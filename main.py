@@ -25,7 +25,7 @@ pygame.display.set_caption("Shoot or Die")
 clock = pygame.time.Clock()
 
 tip_of_the_session = constants.TIPS[random.randint(0, len(constants.TIPS) - 1)]
-level = 7
+level = 1
 start_game = False
 pause_game = False
 start_intro = False
@@ -192,8 +192,8 @@ def show_dialog_box(message):
         screen.blit(coin_images[0], (230, 200))
         draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
     if message["new_item"] == "AID":
-        screen.blit(aid_images[0], (230, 200))
-        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+        screen.blit(aid_images[0], (230, 210))
+        draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
     if message["new_item"] == "BLAZE":
         screen.blit(blaze_images[0], (230, 200))
         draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
@@ -414,6 +414,9 @@ while running:
             world.draw(screen)
             player.draw(screen)
             
+            for villain_bullet in villain_bullet_group:
+                villain_bullet.draw(screen)
+
             for villain in villain_list:
                 villain.draw(screen)
             
@@ -422,8 +425,7 @@ while running:
             for bullet in bullet_group:
                 bullet.draw(screen)
             
-            for villain_bullet in villain_bullet_group:
-                villain_bullet.draw(screen)
+            # show_dialog_box(constants.LEVEL_CLEAR_MESSAGE[3])
             
             damage_text_group.draw(screen)
             item_group.draw(screen)

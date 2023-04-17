@@ -63,7 +63,7 @@ class Weapon():
     
     def draw(self, surface):
         self.image = pygame.transform.rotate(self.original_image, self.direction)
-        surface.blit(self.image, (self.rect.centerx - int(self.image.get_width()/2), self.rect.centery - int(self.image.get_height()/2)))
+        # surface.blit(self.image, (self.rect.centerx - int(self.image.get_width()/2), self.rect.centery - int(self.image.get_height()/2)))
     
 
     

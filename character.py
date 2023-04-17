@@ -176,5 +176,5 @@ class Character():
             # surface.blit(direction_image, self.rect)
         else:
             surface.blit(direction_image, self.rect)
-        pygame.draw.rect(surface, constants.RED, self.rect, 1)
+        # pygame.draw.rect(surface, constants.RED, self.rect, 1)
         # print(self.direction)
