@@ -15,22 +15,22 @@
             "scaleInDock": 1
         },
         "/Users/amitesh/codes/hackathon_PyGame/levels/level1_data.tmj": {
-            "scale": 0.5248,
+            "scale": 0.5935,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 438.2621951219511,
-                "y": 270.57926829268285
+                "x": 544.229149115417,
+                "y": 485.2569502948609
             }
         },
         "/Users/amitesh/codes/hackathon_PyGame/levels/level1_data.tmj#floor": {
             "scaleInDock": 1
         },
         "/Users/amitesh/codes/hackathon_PyGame/levels/level2_data.tmj": {
-            "scale": 0.8422,
+            "scale": 0.6802,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 617.4305390643552,
-                "y": 442.88767513654716
+                "x": 626.2863863569538,
+                "y": 439.57659511908264
             }
         },
         "/Users/amitesh/codes/hackathon_PyGame/levels/level2_data.tmj#floor": {
