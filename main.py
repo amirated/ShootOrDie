@@ -196,10 +196,10 @@ def show_dialog_box(message):
         draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
     if message["new_item"] == "BLAZE":
         screen.blit(blaze_images[0], (230, 200))
-        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+        draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
     if message["new_item"] == "FLAGGER":
         screen.blit(flagger_images[0], (230, 200))
-        draw_text(message["new_item_description"], font, constants.BLACK, 270, 200)
+        draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
     if message["new_item"] == "TROPHY":
         screen.blit(trophy_image, (220, 200))
         draw_text(message["new_item_description"], font, constants.BLACK, 300, 220)
