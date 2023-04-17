@@ -9,7 +9,7 @@ class World():
         self.exit_tile = None
         self.item_list = []
         self.player = None
-        self.character_list = []
+        self.villain_list = []
     
     def process_data(self, data, tile_list, item_images, mob_animations):
         self.level_length = len(data)
@@ -34,12 +34,12 @@ class World():
                     self.item_list.append(aid)
                     tile_data[0] = tile_list[0]
                 elif tile == 11: # player
-                    player = Character(image_x, image_y, 100, mob_animations, 0, False, 2)
+                    player = Character(image_x, image_y, 100, mob_animations, 0, False, 2, self.villain_list)
                     self.player = player
                     tile_data[0] = tile_list[0]
                 elif tile == 12: # villain
-                    villain = Character(image_x, image_y, 100, mob_animations, 1, False, 2)
-                    self.character_list.append(villain)
+                    villain = Character(image_x, image_y, 100, mob_animations, 1, False, 2, self.villain_list)
+                    self.villain_list.append(villain)
                     tile_data[0] = tile_list[0]
                 elif tile == 14: # blaze
                     blaze = Item(image_x, image_y, 2, item_images[2])

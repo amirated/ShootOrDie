@@ -4,11 +4,11 @@ import random
 import csv
 from pygame import mixer
 import constants
+from world import World
 from character import Character
 from weapon import Weapon
 from weapon import Bullet
 from items import Item
-from world import World
 from button import Button
 
 # pygame setup
@@ -159,6 +159,11 @@ def display_controls():
     draw_text("SHOOT: Mouse Left", font, constants.WHITE, 140, 160)
     draw_text(f"TIP: {tip_of_the_session}", font, constants.WHITE, 120, 300)
 
+def show_message(message):
+    pygame.draw.rect(screen, constants.WHITE, (200, 150, constants.SCREEN_WIDTH - 400, 100))
+    draw_text(message, font, constants.BLACK, 220, 170)
+    # draw_text(message, font, constants.BLACK, 220, 200)
+
 def reset_level():
     death_fx_played = False
     play_music('suspense')
@@ -232,7 +237,7 @@ player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player = world.player
 gun = Weapon(gun_image, bullet_image)
 
-villain_list = world.character_list
+villain_list = world.villain_list
 
 damage_text_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
@@ -306,8 +311,8 @@ while running:
                     dy = (constants.SPEED + player.speed_mod)
             
 
-                screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
-                
+                screen_scroll, level_complete, display_message = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
+
                 world.update(screen_scroll)
                 for villain in villain_list:
                     villain_bullet = villain.ai(player, world.obstacle_tiles, screen_scroll, villain_bullet_image)
@@ -363,6 +368,8 @@ while running:
             item_group.draw(screen)
             display_info()
             score_coin.draw(screen)
+            if display_message:
+                show_message(display_message)
 
             if level_complete == True:
                 start_intro = True
@@ -383,7 +390,7 @@ while running:
                 player.health = temp_health
                 player.score = temp_score
 
-                villain_list = world.character_list
+                villain_list = world.villain_list
                 score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
                 item_group.add(score_coin)
 
@@ -419,7 +426,7 @@ while running:
                         player = world.player
                         player.score = temp_score
 
-                        villain_list = world.character_list
+                        villain_list = world.villain_list
                         score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
                         item_group.add(score_coin)
 

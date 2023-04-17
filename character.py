@@ -4,7 +4,7 @@ import constants
 import math
 
 class Character():
-    def __init__(self, x, y, health, mob_animations, char_type, boss, size):
+    def __init__(self, x, y, health, mob_animations, char_type, boss, size, villain_list):
         self.char_type = char_type
         self.boss = boss
         self.score = 0
@@ -14,6 +14,7 @@ class Character():
         self.frame_index = 0
         self.action = 0 # 0: idle, 1: run
         self.animation_list = mob_animations[char_type]
+        self.world_villain_list = villain_list
         self.update_time = pygame.time.get_ticks()
         self.running = False
         self.health = health
@@ -26,9 +27,11 @@ class Character():
         self.rect = pygame.Rect(0, 0, constants.CHAR_SIZE * size, constants.CHAR_SIZE * size)
         self.rect.center = (x, y)
     
+    
     def move(self, dx, dy, obstacle_tiles, exit_tile = None):
         screen_scroll = [0, 0]
         level_complete = False
+        display_message = None
 
         self.running = False
         #control diagonal speed
@@ -76,7 +79,11 @@ class Character():
             if exit_tile[1].colliderect(self.rect):
                 exit_distance = math.sqrt(((self.rect.centerx - exit_tile[1].centerx) ** 2) + ((self.rect.centery - exit_tile[1].centery) ** 2))
                 if exit_distance < 20:
-                    level_complete = True
+                    if len(self.world_villain_list) > 0:
+                        display_message = "Portal locked! Destroy all villains to unlock this portal."
+                    else:
+                        display_message = "Level complete!"
+                        level_complete = True
             if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X):
                 screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X) - self.rect.right
                 self.rect.right = constants.SCREEN_WIDTH - constants.SCROLL_THRESH_X
@@ -90,7 +97,7 @@ class Character():
             if self.rect.top < constants.SCROLL_THRESH_Y:
                 screen_scroll[1] = constants.SCROLL_THRESH_Y - self.rect.top
                 self.rect.top = constants.SCROLL_THRESH_Y
-        return screen_scroll, level_complete
+        return screen_scroll, level_complete, display_message
     
     def ai(self, player, obstacle_tiles, screen_scroll, villain_bullet_image):
         clipped_line = ()
